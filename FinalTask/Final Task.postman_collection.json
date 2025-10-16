@@ -1,0 +1,721 @@
+{
+	"info": {
+		"_postman_id": "b38797af-fd38-4ce8-9559-d3a399fe8806",
+		"name": "Final Task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41968407"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response has tokens\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"\r",
+									"    const access = res.access_token || res.accessToken || res.token;\r",
+									"    const refresh = res.refresh_token || res.refreshToken || res.refresh;\r",
+									"\r",
+									"    pm.expect(access, \"accessToken\").to.be.a('string');\r",
+									"    pm.environment.set(\"auth_token\", access);\r",
+									"\r",
+									"    if (refresh) {\r",
+									"        pm.environment.set(\"refresh_token\", refresh);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{admin_email}}\",\r\n  \"password\": \"{{admin_password}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response has tokens\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"\r",
+									"    const access = res.access_token || res.accessToken || res.token;\r",
+									"    const refresh = res.refresh_token || res.refreshToken || res.refresh;\r",
+									"\r",
+									"    pm.expect(access, \"accessToken\").to.be.a('string');\r",
+									"    pm.environment.set(\"auth_token\", access);\r",
+									"\r",
+									"    if (refresh) {\r",
+									"        pm.environment.set(\"refresh_token\", refresh);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"refreshToken\": \"{{refresh_token}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 or 204\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"auth_token\", null);\r",
+									"\r",
+									"pm.environment.set(\"refresh_token\", null);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"refreshToken\": \"{{refresh_token}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();\r",
+									"pm.test(\"Has id\", () => pm.expect(res).to.have.property(\"id\"));\r",
+									"pm.environment.set(\"user_id\", res.id);\r",
+									"\r",
+									"const userSchema = {\r",
+									"  type: \"object\",\r",
+									"  properties: {\r",
+									"    id: { type: \"number\" },\r",
+									"    name: { type: \"string\" },\r",
+									"    email: { type: \"string\" },\r",
+									"    createdAt: { type: \"string\" }\r",
+									"  },\r",
+									"  required: [\"id\", \"name\", \"email\"]\r",
+									"};\r",
+									"pm.test(\"Matches user schema\", () => pm.expect(tv4.validate(res, userSchema)).to.be.true);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const random = Math.floor(Math.random() * 10000);\r",
+									"pm.variables.set(\"random_email\", `john.doe+${random}@example.com`);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"{{name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();\r",
+									"pm.test(\"User has correct structure\", () => {\r",
+									"    pm.expect(res.items[0]).to.have.property(\"id\");\r",
+									"    pm.expect(res.items[0]).to.have.property(\"name\");\r",
+									"    pm.expect(res.items[0]).to.have.property(\"email\");\r",
+									"    pm.expect(res.items[0]).to.have.property(\"createdAt\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users?page=1&pageSize=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User has correct structure\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res).to.have.property(\"id\");\r",
+									"    pm.expect(res).to.have.property(\"name\");\r",
+									"    pm.expect(res).to.have.property(\"email\");\r",
+									"    pm.expect(res).to.have.property(\"createdAt\");\r",
+									"});\r",
+									"pm.test(\"User ID matches\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res.id).to.eql(Number(pm.environment.get(\"user_id\")));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+									"const res = pm.response.json();\r",
+									"pm.test(\"Name updated\", () => {\r",
+									"    pm.expect(res.name).to.eql(\"John Updated\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"John Updated\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}\n",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}\n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 or 204\", () => pm.expect(pm.response.code).to.be.oneOf([200,204]));\r",
+									"\r",
+									"// Проверка, что пользователь удалён\r",
+									"pm.sendRequest({\r",
+									"    url: `${pm.environment.get(\"base_url\")}/users/${pm.environment.get(\"user_id\")}`,\r",
+									"    method: 'GET',\r",
+									"    header: { Authorization: `Bearer ${pm.environment.get(\"auth_token\")}` }\r",
+									"}, function (err, res) {\r",
+									"    pm.test(\"User is deleted (404)\", () => {\r",
+									"        pm.expect(res.code).to.eql(404);\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}\n",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}\n"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get Products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+									"pm.test(\"Response is array\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(Array.isArray(res)).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products?filter=name:laptop",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "name:laptop"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Laptop\",\r\n  \"price\": 1200\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Product updated\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res.name).to.eql(\"Laptop Pro\");\r",
+									"    pm.expect(res.price).to.eql(1500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Laptop Pro\",\r\n  \"price\": 1500\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Create Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();\r",
+									"pm.environment.set(\"order_id\", res.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": {{user_id}},\r\n  \"productIds\": [ {{product_id}} ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Orders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response has items array\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    pm.expect(res).to.be.an('array').that.is.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each order has fields\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    res.forEach(o => {\r",
+									"        pm.expect(o).to.have.property(\"id\");\r",
+									"        pm.expect(o).to.have.property(\"userId\");\r",
+									"        pm.expect(o).to.have.property(\"createdAt\");\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"const token = pm.environment.get(\"auth_token\");\r",
+					"if (token) {\r",
+					"    pm.request.headers.upsert({ key: \"Authorization\", value: `Bearer ${token}` });\r",
+					"}\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"// Проверка кода ответа\r",
+					"pm.test(\"Status 2xx or 3xx\", () => {\r",
+					"    const statusCode = pm.response.code;\r",
+					"    pm.expect(statusCode).to.be.at.least(200).and.to.be.below(400);\r",
+					"});\r",
+					"\r",
+					"\r",
+					"// Проверка наличия Content-Type\r",
+					"pm.test(\"Content-Type present if body exists\", () => {\r",
+					"    if (pm.response.code !== 204) {\r",
+					"        pm.response.to.have.header(\"Content-Type\");\r",
+					"    } else {\r",
+					"        pm.expect(pm.response.text()).to.eql(\"\"); // проверяем что реально пусто\r",
+					"    }\r",
+					"});\r",
+					"\r",
+					"\r",
+					"\r",
+					"pm.test(\"Response time performance\", function () {\r",
+					"    const responseTime = pm.response.responseTime;\r",
+					"    pm.expect(responseTime).to.be.below(1000); // P99\r",
+					"});\r",
+					"\r",
+					"// Проверка security headers\r",
+					"pm.test(\"Security headers are present\", function () {\r",
+					"    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');\r",
+					"    pm.expect(pm.response.headers.get('X-Frame-Options')).to.eql('DENY');\r",
+					"    pm.expect(pm.response.headers.get('X-XSS-Protection')).to.eql('1; mode=block');\r",
+					"});\r",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "admin_email",
+			"value": ""
+		},
+		{
+			"key": "admin_password",
+			"value": ""
+		},
+		{
+			"key": "timeout",
+			"value": ""
+		}
+	]
+}
