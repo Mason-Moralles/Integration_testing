@@ -38,7 +38,7 @@ REST API на .NET 8 Minimal API с чистой архитектурой для
 
 ### 💻 Локальный запуск 
 ```bash
-cd FinalTask
+cd FinalTas
 dotnet run
 ```
 
